@@ -32,22 +32,23 @@ describe('app routes', () => {
   });
   it('get all studios', async() => {
     const studios = await Studio.create([
-      { name: 'MGM', address: 'Hollywood' },
-      { name: 'Paramount', address: 'NYC' },
-      { name: 'Universal', address: 'San Fernando' }
+      { name: 'MGM' },
+      { name: 'Paramount' },
+      { name: 'Universal' }
     ]);
     return request(app)
       .get('/api/v1/studios')
       .then(res => {
         const studiosJSON = JSON.parse(JSON.stringify(studios));
-        studiosJSON.forEach(studio => {
-          expect(res.body).toContainEqual(studio);
+        studiosJSON.forEach((studio) => {
+          expect(res.body).toContainEqual({ name: studio.name, _id: studio._id });
         });
       });
   });
   it('gets a studio by an id', async() => {
     const studio = await Studio.create({
-      name: 'MGM'
+      name: 'MGM',
+      address: { city: 'Portland', state: 'OR', country: 'USA' }
     });
     return request(app)
       .get(`/api/v1/studios/${studio._id}`)
@@ -55,7 +56,7 @@ describe('app routes', () => {
         expect(res.body).toEqual({
           _id: expect.any(String),
           name: 'MGM',
-          __v: 0
+          address: { city: 'Portland', state: 'OR', country: 'USA' },
         });
       });
   });
