@@ -48,7 +48,7 @@ describe('app routes', () => {
   it('gets a studio by an id', async() => {
     const studio = await Studio.create({
       name: 'MGM',
-      address: { city: 'Portland', state: 'OR', country: 'USA' }
+      address: { city: 'Beverly Hills', state: 'CA', country: 'USA' }
     });
     return request(app)
       .get(`/api/v1/studios/${studio._id}`)
@@ -56,7 +56,7 @@ describe('app routes', () => {
         expect(res.body).toEqual({
           _id: expect.any(String),
           name: 'MGM',
-          address: { city: 'Portland', state: 'OR', country: 'USA' },
+          address: { city: 'Beverly Hills', state: 'CA', country: 'USA' },
         });
       });
   });
