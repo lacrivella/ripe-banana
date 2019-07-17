@@ -59,4 +59,18 @@ describe('app routes', () => {
         });
       });
   });
+  it('deletes a studio', async() => {
+    const studio = await Studio.create({
+      name: 'Disney'
+    });
+    return request(app)
+      .delete(`/api/v1/studios/${studio._id}`)
+      .then(res => {
+        expect(res.body).toEqual({
+          _id: expect.any(String),
+          name: 'Disney',
+          __v: 0
+        });
+      });
+  });
 });
