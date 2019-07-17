@@ -47,4 +47,21 @@ describe('actor routes', () => {
         });
       });
   });
+  it('get an actor by id', async() => {
+    const actor = await Actor.create({
+      name: 'Tilda Swinton',
+      dob: 'November 5, 1960',
+      pob: 'London'
+    });
+    return request(app)
+      .get(`/api/v1/actors/${actor._id}`)
+      .then(res => {
+        expect(res.body).toEqual({
+          _id: expect.any(String),
+          name: 'Tilda Swinton',
+          dob: expect.any(String),
+          pob: 'London'
+        });
+      });
+  });
 });
