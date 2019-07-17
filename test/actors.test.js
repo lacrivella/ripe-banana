@@ -32,4 +32,19 @@ describe('actor routes', () => {
         });
       });
   });
+  it('get all actors', async() => {
+    const actors = await Actor.create([
+      { name: 'Tim Curry' },
+      { name: 'Michael McKean' },
+      { name: 'Lesley Ann Warren' }
+    ]);
+    return request(app)
+      .get('/api/v1/actors')
+      .then(res => {
+        const actorsJSON = JSON.parse(JSON.stringify(actors));
+        actorsJSON.forEach((actor) => {
+          expect(res.body).toContainEqual({ name: actor.name, _id: actor._id });
+        });
+      });
+  });
 });
