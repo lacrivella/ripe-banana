@@ -4,6 +4,7 @@ const request = require('supertest');
 const app = require('../lib/app');
 const connect = require('../lib/utils/connect');
 const mongoose = require('mongoose');
+const Studio = require('../lib/models/Studio');
 
 describe('app routes', () => {
   beforeAll(() => {
@@ -17,7 +18,7 @@ describe('app routes', () => {
   afterAll(() => {
     return mongoose.connection.close();
   });
-  it('ost a new studio', () => {
+  it('post a new studio', () => {
     return request(app)
       .post('/api/v1/studios')
       .send({ name: 'MGM' })
@@ -26,6 +27,21 @@ describe('app routes', () => {
           _id: expect.any(String),
           name: 'MGM',
           __v: 0
+        });
+      });
+  });
+  it('get all studios', async() => {
+    const studios = await Studio.create([
+      { name: 'MGM', address: 'Hollywood' },
+      { name: 'Paramount', address: 'Hollywood' },
+      { name: 'Universal', address: 'San Fernando' }
+    ]);
+    return request(app)
+      .get('/api/v1/studios')
+      .then(res => {
+        const studiosJSON = JSON.parse(JSON.stringify(studios));
+        studiosJSON.forEach(studio => {
+          expect(res.body).toContainEqual(studio);
         });
       });
   });
