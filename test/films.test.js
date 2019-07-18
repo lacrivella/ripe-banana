@@ -94,7 +94,25 @@ describe('film routes', () => {
         });
       });
   });
+  it('deletes film', async() => {
+    const film = await Film.create({
+      title: 'Gentlemans Agreement',
+      studio: studio._id,
+      released: 1947,
+      cast: [{ role: 'Philip Schuyler Green', actor: actor._id }]
+    });
+    return request(app)
+      .delete(`/api/v1/films/${film._id}`)
+      .then(res => {
+        expect(res.body).toEqual({
+          _id: expect.any(String),
+          title: 'Gentlemans Agreement',
+          studio: studio._id,
+          released: 1947,
+          cast: [{ _id: expect.any(String), role: 'Philip Schuyler Green', actor: actor._id }],
+          __v: 0
+        });
+      });
+  });
 });
 
-
-//expect title, studio, released, cast(id strin, role, actor)
