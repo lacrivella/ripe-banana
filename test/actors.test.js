@@ -64,4 +64,27 @@ describe('actor routes', () => {
         });
       });
   });
+  it('puts an updated actor', async() => {
+    const actor = await Actor.create({
+      name: 'Bette Davis',
+      dob: 'April 5, 1908',
+      pob: 'France'
+    });
+    return request(app)
+      .put(`/api/v1/actors/${actor._id}`)
+      .send({
+        name: 'Ann Baxter',
+        dob: 'May 7, 1923',
+        pob: 'Michigan City'
+      })
+      .then(res => {
+        expect(res.body).toEqual({
+          _id: expect.any(String),
+          name: 'Ann Baxter',
+          dob: expect.any(String),
+          pob: 'Michigan City',
+          __v: 0
+        });
+      });
+  });
 });
