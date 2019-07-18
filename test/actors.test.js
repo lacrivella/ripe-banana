@@ -87,4 +87,22 @@ describe('actor routes', () => {
         });
       });
   });
+  it('deletes an actor', async() => {
+    const actor = await Actor.create({
+      name: 'Winona Ryder',
+      dob: 'October 29, 1971',
+      pob: 'Winona, MN'
+    });
+    return request(app)
+      .delete(`/api/v1/actors/${actor._id}`)
+      .then(res => {
+        expect(res.body).toEqual({
+          _id: expect.any(String),
+          name: 'Winona Ryder',
+          dob: expect.any(String),
+          pob: 'Winona, MN',
+          __v: 0
+        });
+      });
+  });
 });
