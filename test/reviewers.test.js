@@ -46,4 +46,19 @@ describe('reviewer routes', () => {
         });
       });
   });
+  it('get a reviewer by id', async() => {
+    const reviewer = await Reviewer.create({
+      name: 'Roger Ebert',
+      company: 'Chicago Sun-Times'
+    });
+    return request(app)
+      .get(`/api/v1/reviewers/${reviewer._id}`)
+      .then(res => {
+        expect(res.body).toEqual({
+          _id: expect.any(String),
+          name: 'Roger Ebert',
+          company: 'Chicago Sun-Times'
+        });
+      });
+  });
 });
