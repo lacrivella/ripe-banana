@@ -61,4 +61,24 @@ describe('reviewer routes', () => {
         });
       });
   });
+  it('puts an updated reviewer', async() => {
+    const reviewer = await Reviewer.create({
+      name: 'Judge Judy',
+      company: 'Judgey Court'
+    });
+    return request(app)
+      .put(`/api/v1/reviewers/${reviewer._id}`)
+      .send({
+        name: 'LA Crivella',
+        company: 'Silently Judging You'
+      })
+      .then(res => {
+        expect(res.body).toEqual({
+          _id: expect.any(String),
+          name: 'LA Crivella',
+          company: 'Silently Judging You',
+          __v: 0
+        });
+      });
+  });
 });
