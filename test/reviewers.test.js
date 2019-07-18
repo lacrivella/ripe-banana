@@ -21,12 +21,28 @@ describe('reviewer routes', () => {
   it('post a new reviewer', () => {
     return request(app)
       .post('/api/v1/reviewers')
-      .send({ name: 'Statler' })
+      .send({ name: 'Statler', company: 'Muppet' })
       .then(res => {
         expect(res.body).toEqual({
           _id: expect.any(String),
           name: 'Statler',
+          company: 'Muppet',
           __v: 0
+        });
+      });
+  });
+  it('gets all the reviewers', async() => {
+    const reviewers = await Reviewer.create([
+      { name: 'Statler', company: 'Muppet' },
+      { name: 'Waldorf', company: 'Balconey' },
+      { name: 'Judith Crist', company: 'New York Herald' }
+    ]);
+    return request(app)
+      .get('/api/v1/reviewers')
+      .then(res => {
+        const reviewersJSON = JSON.parse(JSON.stringify(reviewers));
+        reviewersJSON.forEach((reviewer) => {
+          expect(res.body).toContainEqual({ name: reviewer.name, company: reviewer.company, _id: reviewer._id });
         });
       });
   });
