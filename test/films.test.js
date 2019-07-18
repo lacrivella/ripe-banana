@@ -57,4 +57,44 @@ describe('film routes', () => {
         });
       });
   });
+  it('get all films', async() => {
+    await Film.create([
+      { title: 'the Omen', studio: studio._id, released: 1976, cast: [{ role: 'Rober Thorn', actor: actor._id }] }
+    ]);
+    return request(app)
+      .get('/api/v1/films')
+      .then(res => {
+        expect(res.body).toEqual([{
+          _id: expect.any(String),
+          title: 'the Omen',
+          studio: { _id: studio._id, name: 'Cinecitta' },
+          released: 1976
+        }]);   
+      });
+  });
+  it('get film by id', async() => {
+    const film = await Film.create({
+      title: 'To Kill a Mockingbird',
+      studio: studio._id,
+      released: 1962,
+      cast: [{ role: 'Atticus Finch', actor: actor._id }]
+    });
+    return request(app)
+      .get(`/api/v1/films/${film._id}`)
+      .then(res => {
+        expect(res.body).toEqual({
+          title: 'To Kill a Mockingbird',
+          studio: { _id: studio._id, name: studio.name },
+          released: 1962,
+          cast: [{
+            _id: expect.any(String),
+            role: 'Atticus Finch',
+            actor: { _id: actor._id, name: actor.name }
+          }]
+        });
+      });
+  });
 });
+
+
+//expect title, studio, released, cast(id strin, role, actor)
