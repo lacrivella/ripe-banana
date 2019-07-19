@@ -28,7 +28,7 @@ describe('actor routes', () => {
         expect(res.body).toEqual({
           _id: expect.any(String),
           name: 'Billy Zane',
-          dob: '1966-02-24T08:00:00.000Z',
+          dob: expect.any(String),
           pob: 'Chicago',
           __v: 0
         });
