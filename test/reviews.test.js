@@ -4,7 +4,7 @@ const request = require('supertest');
 const app = require('../lib/app');
 const connect = require('../lib/utils/connect');
 const mongoose = require('mongoose');
-// const Review = require('../lib/models/Review');
+const Review = require('../lib/models/Review');
 const Film = require('../lib/models/Film');
 const Studio = require('../lib/models/Studio');
 const Actor = require('../lib/models/Actor');
@@ -60,7 +60,8 @@ describe('review routes', () => {
       reviewer: reviewer._id,
       review: 'blah blah blah',
       film: film._id,
-    }
+    };
+
     return request(app)
       .post('/api/v1/reviews')
       .send(reviewMovie)
@@ -77,9 +78,20 @@ describe('review routes', () => {
         });
       });
   });
+  it('gets all review with the 100 most recent', async() => {
+    await Promise.all([...Array(101)].map((review, i) => {
+      return Review.create({
+        rating: 5,
+        reviewer: reviewer._id,
+        review: `this is movie ${i}`,
+        film: film._id
+      });
+    }));
+
+    return request(app)
+      .get('/api/v1/reviews')
+      .then(res => {
+        expect(res.body).toHaveLength(100);
+      });
+  });
 });
-  
-  // rating,
-  // reviewer,
-  // review,
-  //  film
