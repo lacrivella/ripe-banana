@@ -53,7 +53,7 @@ describe('actor routes', () => {
     const actor = JSON.parse(JSON.stringify(await Actor.create({
       name: 'Tilda Swinton',
       dob: 'November 5, 1960',
-      pob: 'London'
+      pob: 'London' 
     })));
     const studio = JSON.parse(JSON.stringify(await Studio.create({
       name: 'Babelsberg Film Studio',
@@ -75,9 +75,9 @@ describe('actor routes', () => {
       .then(res => {
         expect(res.body).toEqual({
           _id: actor._id,
-          name: 'Tilda Swinton',
+          name: actor.name,
           dob: actor.dob,
-          pob: 'London',
+          pob: actor.pob,
           films: [{
             _id: film._id,
             title: film.title,
@@ -125,6 +125,42 @@ describe('actor routes', () => {
           pob: 'Winona, MN',
           __v: 0
         });
+      });
+  });
+  it('cannot delete an actor if they star in a film', async() => {
+    const studio = JSON.parse(JSON.stringify(await Studio.create({
+      name: 'Disney'
+    })));
+
+    const actor = JSON.parse(JSON.stringify(await Actor.create({
+      name: 'Meryl Streep',
+      dob: 'June 22, 1949',
+      pob: 'Summit, NJ'
+    })));
+
+    const film = JSON.parse(JSON.stringify(await Film.create({
+      title: 'the Devil Wears Prada', 
+      studio: studio._id, 
+      released: 2006, 
+      cast: [{ role: 'Miranda Priestly', actor: actor._id }]
+    })));
+
+    return request(app)
+      .delete(`/api/v1/actors/${actor._id}`)
+      .then(res => {
+        expect(res.status).toEqual(409);
+      });
+  });
+  it('deletes an actor who sucks and are not in films', async() => {
+    const actor = JSON.parse(JSON.stringify(await Actor.create({
+      name: 'Nicolas Cage',
+      dob: 'June 22, 1949',
+      pob: 'Summit, NJ'
+    })));
+    return request(app)
+      .delete(`/api/v1/actors/${actor._id}`)
+      .then(res => {
+        expect(res.body.name).toEqual('Nicolas Cage');
       });
   });
 });

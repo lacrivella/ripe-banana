@@ -121,4 +121,14 @@ describe('app routes', () => {
         expect(res.status).toEqual(409);
       });
   });
+  it('deletes a studio with no films', async() => {
+    const studio = JSON.parse(JSON.stringify(await Studio.create({
+      name: 'Disney'
+    })));
+    return request(app)
+      .delete(`/api/v1/studios/${studio._id}`)
+      .then(res => {
+        expect(res.body.name).toEqual('Disney');
+      });
+  });
 });
