@@ -5,6 +5,8 @@ const app = require('../lib/app');
 const connect = require('../lib/utils/connect');
 const mongoose = require('mongoose');
 const Actor = require('../lib/models/Actor');
+const Film = require('../lib/models/Film');
+const Studio = require('../lib/models/Studio');
 
 describe('actor routes', () => {
   beforeAll(() => {
@@ -48,19 +50,39 @@ describe('actor routes', () => {
       });
   });
   it('get an actor by id', async() => {
-    const actor = await Actor.create({
+    const actor = JSON.parse(JSON.stringify(await Actor.create({
       name: 'Tilda Swinton',
       dob: 'November 5, 1960',
       pob: 'London'
-    });
+    })));
+    const studio = JSON.parse(JSON.stringify(await Studio.create({
+      name: 'Babelsberg Film Studio',
+      address: {
+        city: 'Potsdam',
+        state: 'Brandenburg',
+        country: 'Germany'
+      }
+    })));
+    const film = JSON.parse(JSON.stringify(await Film.create({
+      title: 'Grand Budapest Hotel',
+      studio: studio._id,
+      released: 2014,
+      cast: [{ role: 'Madame D', actor: actor._id }]
+    })));
+
     return request(app)
       .get(`/api/v1/actors/${actor._id}`)
       .then(res => {
         expect(res.body).toEqual({
-          _id: expect.any(String),
+          _id: actor._id,
           name: 'Tilda Swinton',
-          dob: expect.any(String),
-          pob: 'London'
+          dob: actor.dob,
+          pob: 'London',
+          films: [{
+            _id: film._id,
+            title: film.title,
+            released: film.released
+          }]
         });
       });
   });
