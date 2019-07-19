@@ -5,6 +5,10 @@ const app = require('../lib/app');
 const connect = require('../lib/utils/connect');
 const mongoose = require('mongoose');
 const Reviewer = require('../lib/models/Reviewer');
+const Actor = require('../lib/models/Actor');
+const Studio = require('../lib/models/Studio');
+const Film = require('../lib/models/Film');
+const Review = require('../lib/models/Review');
 
 describe('reviewer routes', () => {
   beforeAll(() => {
@@ -46,21 +50,62 @@ describe('reviewer routes', () => {
         });
       });
   });
+
   it('get a reviewer by id', async() => {
-    const reviewer = await Reviewer.create({
+    const reviewer = JSON.parse(JSON.stringify(await Reviewer.create({
       name: 'Roger Ebert',
       company: 'Chicago Sun-Times'
-    });
+    })));
+
+    const actor = JSON.parse(JSON.stringify(await Actor.create({
+      name: 'Keanu Reeves',
+      dob: new Date('September 2, 1964'),
+      pob: 'Beirut, Lebanon'
+    })));
+
+    const studio = JSON.parse(JSON.stringify(await Studio.create({
+      name: 'Cinecitta',
+      address: {
+        city: 'Rome',
+        state: 'Lazio',
+        country: 'Italy'
+      }
+    })));
+
+    const film = JSON.parse(JSON.stringify(await Film.create({
+      title: 'John Wick 3',
+      studio: studio._id,
+      released: 1962,
+      cast: [{ role: 'John Wick', actor: actor._id }]
+    })));
+
+    const review = JSON.parse(JSON.stringify(await Review.create({
+      rating: 4,
+      reviewer: reviewer._id,
+      review: 'blah blah',
+      film: film._id
+    })));
+
     return request(app)
       .get(`/api/v1/reviewers/${reviewer._id}`)
       .then(res => {
         expect(res.body).toEqual({
-          _id: expect.any(String),
+          _id: reviewer._id,
           name: 'Roger Ebert',
-          company: 'Chicago Sun-Times'
+          company: 'Chicago Sun-Times',
+          reviews: [{
+            _id: review._id,
+            rating: review.rating,
+            review: review.review,
+            film: {
+              _id: film._id,
+              title: film.title
+            } 
+          }]
         });
       });
   });
+
   it('puts an updated reviewer', async() => {
     const reviewer = await Reviewer.create({
       name: 'Judge Judy',
