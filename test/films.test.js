@@ -7,6 +7,8 @@ const mongoose = require('mongoose');
 const Film = require('../lib/models/Film');
 const Studio = require('../lib/models/Studio');
 const Actor = require('../lib/models/Actor');
+const Review = require('../lib/models/Review');
+const Reviewer = require('../lib/models/Reviewer');
 
 describe('film routes', () => {
   beforeAll(() => {
@@ -73,12 +75,25 @@ describe('film routes', () => {
       });
   });
   it('get film by id', async() => {
-    const film = await Film.create({
+    const film = JSON.parse(JSON.stringify(await Film.create({
       title: 'To Kill a Mockingbird',
       studio: studio._id,
       released: 1962,
       cast: [{ role: 'Atticus Finch', actor: actor._id }]
-    });
+    })));
+
+    const reviewer = JSON.parse(JSON.stringify(await Reviewer.create({
+      name: 'Judge Taylor',
+      company: 'Ridic Reference'
+    })));
+
+    const review = JSON.parse(JSON.stringify(await Review.create({
+      rating: 4,
+      reviewer: reviewer._id,
+      review: 'blah blah',
+      film: film._id
+    })));
+
     return request(app)
       .get(`/api/v1/films/${film._id}`)
       .then(res => {
@@ -90,6 +105,15 @@ describe('film routes', () => {
             _id: expect.any(String),
             role: 'Atticus Finch',
             actor: { _id: actor._id, name: actor.name }
+          }],
+          reviews: [{
+            _id: review._id,
+            rating: review.rating,
+            review: review.review,
+            reviewer: {
+              _id: reviewer._id,
+              name: reviewer.name
+            }
           }]
         });
       });

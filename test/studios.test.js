@@ -69,7 +69,6 @@ describe('app routes', () => {
     return request(app)
       .get(`/api/v1/studios/${studio._id}`)
       .then(res => {
-        console.log(res.body);
         const filmJSON = JSON.parse(JSON.stringify(film));
         const studioJSON = JSON.parse(JSON.stringify(studio));
 
