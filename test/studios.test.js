@@ -5,6 +5,8 @@ const app = require('../lib/app');
 const connect = require('../lib/utils/connect');
 const mongoose = require('mongoose');
 const Studio = require('../lib/models/Studio');
+const Film = require('../lib/models/Film');
+const Actor = require('../lib/models/Actor');
 
 describe('app routes', () => {
   beforeAll(() => {
@@ -45,18 +47,40 @@ describe('app routes', () => {
         });
       });
   });
-  it('gets a studio by an id', async() => {
+  it('gets a studio by an id updated with film', async() => {
     const studio = await Studio.create({
       name: 'MGM',
       address: { city: 'Beverly Hills', state: 'CA', country: 'USA' }
     });
+    const actor = await Actor.create({
+      name: 'Diego Luna',
+      dob: 'December 29, 1979',
+      pob: 'Toluca, Mexico'
+    });
+    const film = await Film.create({
+      title: 'Rogue One',
+      studio: studio._id,
+      released: 2016,
+      cast: [{
+        role: 'Cassian Andor',
+        actor: actor._id
+      }]
+    });
     return request(app)
       .get(`/api/v1/studios/${studio._id}`)
       .then(res => {
+        console.log(res.body);
+        const filmJSON = JSON.parse(JSON.stringify(film));
+        const studioJSON = JSON.parse(JSON.stringify(studio));
+
         expect(res.body).toEqual({
           _id: expect.any(String),
-          name: 'MGM',
-          address: { city: 'Beverly Hills', state: 'CA', country: 'USA' },
+          name: studioJSON.name,
+          address: studioJSON.address,
+          films: [{
+            _id: filmJSON._id,
+            title: filmJSON.title
+          }]
         });
       });
   });
