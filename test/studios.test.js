@@ -97,4 +97,28 @@ describe('app routes', () => {
         });
       });
   });
+  it('cannot delete if theres a film', async() => {
+    const studio = JSON.parse(JSON.stringify(await Studio.create({
+      name: 'Disney'
+    })));
+
+    const actor = JSON.parse(JSON.stringify(await Actor.create({
+      name: 'Meryl Streep',
+      dob: 'June 22, 1949',
+      pob: 'Summit, NJ'
+    })));
+
+    const film = JSON.parse(JSON.stringify(await Film.create({
+      title: 'the Devil Wears Prada', 
+      studio: studio._id, 
+      released: 2006, 
+      cast: [{ role: 'Miranda Priestly', actor: actor._id }]
+    })));
+
+    return request(app)
+      .delete(`/api/v1/studios/${studio._id}`)
+      .then(res => {
+        expect(res.status).toEqual(409);
+      });
+  });
 });
